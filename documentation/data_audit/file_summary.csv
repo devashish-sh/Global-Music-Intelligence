@@ -1,0 +1,17 @@
+file,platform,rows,markets,chart_dates,first_date,last_date,chart_instances,incomplete_charts,charts_with_duplicate_ranks
+spotify_top200_positions_2018.csv.gz,spotify,73400,35,35,2018-05-03,2018-12-27,367,0,0
+spotify_top200_positions_2019.csv.gz,spotify,106600,35,52,2019-01-03,2019-12-26,533,0,0
+spotify_top200_positions_2020.csv.gz,spotify,108200,36,53,2020-01-02,2020-12-31,541,0,0
+spotify_top200_positions_2021.csv.gz,spotify,111600,37,52,2021-01-07,2021-12-30,558,0,0
+spotify_top200_positions_2022.csv.gz,spotify,114000,38,52,2022-01-06,2022-12-29,570,0,0
+spotify_top200_positions_2023.csv.gz,spotify,114400,38,52,2023-01-05,2023-12-28,572,0,0
+spotify_top200_positions_2024.csv.gz,spotify,114400,38,52,2024-01-04,2024-12-26,572,0,0
+spotify_top200_positions_2025.csv.gz,spotify,114400,38,52,2025-01-02,2025-12-25,572,0,0
+youtube_top100_positions_2018.csv.gz,youtube,154010,44,35,2018-05-03,2018-12-27,1540,9,157
+youtube_top100_positions_2019.csv.gz,youtube,228817,44,52,2019-01-03,2019-12-26,2288,17,237
+youtube_top100_positions_2020.csv.gz,youtube,233217,44,53,2020-01-02,2020-12-31,2332,16,250
+youtube_top100_positions_2021.csv.gz,youtube,228818,44,52,2021-01-07,2021-12-30,2288,16,283
+youtube_top100_positions_2022.csv.gz,youtube,228826,44,52,2022-01-06,2022-12-29,2288,24,277
+youtube_top100_positions_2023.csv.gz,youtube,228816,44,52,2023-01-05,2023-12-28,2288,16,299
+youtube_top100_positions_2024.csv.gz,youtube,228813,44,52,2024-01-04,2024-12-26,2288,13,280
+youtube_top100_positions_2025.csv.gz,youtube,228814,44,52,2025-01-02,2025-12-25,2288,14,266
