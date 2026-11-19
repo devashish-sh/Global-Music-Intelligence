@@ -7,7 +7,9 @@ data/raw/*
 data/staging/*
 data/cleaned/*
 data/exports/*
+dashboard/.server.log
 !data/raw/.gitkeep
 !data/staging/.gitkeep
 !data/cleaned/.gitkeep
 !data/exports/.gitkeep
+tableau/data/*.csv

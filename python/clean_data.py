@@ -271,18 +271,25 @@ def clean_youtube(cursor):
                 THEN NULLIF(BTRIM(prev_rank), '')::INTEGER
             END,
 
+            -- Source values arrive as decimal strings (e.g. '2.0',
+            -- '17835.0'), so they are validated and rounded through
+            -- NUMERIC before being stored as integers.
             CASE
                 WHEN pg_input_is_valid(
-                    NULLIF(BTRIM(weeks_on_chart), ''), 'integer'
+                    NULLIF(BTRIM(weeks_on_chart), ''), 'numeric'
                 )
-                THEN NULLIF(BTRIM(weeks_on_chart), '')::INTEGER
+                THEN ROUND(
+                    NULLIF(BTRIM(weeks_on_chart), '')::NUMERIC
+                )::INTEGER
             END,
 
             CASE
                 WHEN pg_input_is_valid(
-                    NULLIF(BTRIM(views), ''), 'bigint'
+                    NULLIF(BTRIM(views), ''), 'numeric'
                 )
-                THEN NULLIF(BTRIM(views), '')::BIGINT
+                THEN ROUND(
+                    NULLIF(BTRIM(views), '')::NUMERIC
+                )::BIGINT
             END,
 
             cleaned_video_id,

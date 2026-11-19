@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Global Music Intelligence — Analytical Dashboard</title>
+<link rel="stylesheet" href="assets/dashboard.css" />
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">
+      <span class="dot"></span> Spotify &amp; YouTube chart analytics · 2018–2025
+    </div>
+    <h1>Global Music Intelligence</h1>
+    <p class="lede">
+      Weekly chart performance across <strong>38 Spotify</strong> and
+      <strong>44 YouTube</strong> markets, rebuilt from source data into one
+      analysis layer. Every figure below is answered by a SQL query in
+      <code>analysis/02_business_queries.sql</code>.
+    </p>
+    <div class="hero-meta" id="heroMeta"></div>
+  </div>
+</header>
+
+<nav class="toolbar" aria-label="Dashboard controls">
+  <div class="toolbar-inner">
+    <div class="segmented" role="group" aria-label="Platform filter">
+      <button class="seg is-active" data-platform="All">All platforms</button>
+      <button class="seg" data-platform="Spotify"><i class="swatch sp"></i>Spotify</button>
+      <button class="seg" data-platform="YouTube"><i class="swatch yt"></i>YouTube</button>
+    </div>
+    <div class="toolbar-links" id="sectionNav"></div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <section class="kpis" id="kpiGrid" aria-label="Headline metrics"></section>
+
+  <section class="panel" id="s-trend">
+    <header class="panel-head">
+      <span class="qnum">01</span>
+      <div>
+        <h2>Chart activity over time</h2>
+        <p class="question">How stable is chart volume, and how much new music enters each year?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Distinct items per chart week</h3>
+          <span class="hint">How many different songs / videos the chart carries each week</span>
+        </div>
+        <div class="chart" id="weeklyChart"></div>
+        <p class="insight" id="weeklyInsight"></p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Items charting per year</h3>
+          <span class="hint">Distinct songs / videos active in the year; 2018 starts in May</span>
+        </div>
+        <div class="chart" id="annualChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>First-time chart entries</h3>
+          <span class="hint">Items appearing for the first time in their platform's history</span>
+        </div>
+        <div class="chart" id="newItemsChart"></div>
+      </div>
+    </div>
+    <div class="card card-full">
+      <div class="card-head">
+        <h3>Seasonality</h3>
+        <span class="hint">Distinct items per chart date, averaged by month — normalised so growing market coverage can't fake a trend</span>
+      </div>
+      <div class="heatmap" id="seasonHeatmap"></div>
+      <p class="insight" id="seasonInsight"></p>
+    </div>
+  </section>
+
+  <section class="panel" id="s-longevity">
+    <header class="panel-head">
+      <span class="qnum">02</span>
+      <div>
+        <h2>Song longevity</h2>
+        <p class="question">Do hits burn bright and fade, or do they compound into catalogue?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Lifetime distribution</h3>
+          <span class="hint">Distinct chart weeks per item</span>
+        </div>
+        <div class="chart" id="longevityChart"></div>
+        <p class="insight" id="longevityInsight"></p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Concentration of chart presence</h3>
+          <span class="hint">Cumulative share of all chart weeks, by ranked item</span>
+        </div>
+        <div class="chart" id="concentrationChart"></div>
+        <p class="insight" id="concentrationInsight"></p>
+      </div>
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Longest-running songs</h3>
+          <span class="hint">Ranked by distinct chart weeks across all markets</span>
+        </div>
+        <div class="table-wrap" id="topSongsTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-artists">
+    <header class="panel-head">
+      <span class="qnum">03</span>
+      <div>
+        <h2>Artist reach</h2>
+        <p class="question">Which artists hold sustained, multi-market presence rather than a single viral moment?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Top artists by chart weeks</h3>
+          <span class="hint">Bar length = distinct chart dates; label shows markets reached</span>
+        </div>
+        <div class="chart" id="artistChart"></div>
+      </div>
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Artist detail</h3>
+          <span class="hint">Distinct tracking items credited to each artist</span>
+        </div>
+        <div class="table-wrap" id="artistTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-markets">
+    <header class="panel-head">
+      <span class="qnum">04</span>
+      <div>
+        <h2>Market intelligence</h2>
+        <p class="question">Where is chart depth greatest, and does the same song define every market?</p>
+      </div>
+    </header>
+    <div class="callout" id="coverageCallout"></div>
+    <div class="grid-2">
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Market coverage</h3>
+          <span class="hint">Sorted by observations; weeks observed is the comparable denominator</span>
+        </div>
+        <div class="table-wrap tall" id="marketTable"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Market leaders</h3>
+          <span class="hint" id="leaderHint">Song with the most chart weeks in each market</span>
+        </div>
+        <div class="market-picker" id="marketPicker"></div>
+        <div class="table-wrap" id="leaderTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-platforms">
+    <header class="panel-head">
+      <span class="qnum">05</span>
+      <div>
+        <h2>Platform comparison</h2>
+        <p class="question">Which songs own the top slot, how steeply does viewing drop down the chart, and who appears on both?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Songs ranked #1</h3>
+          <span class="hint">Market-weeks spent at the top of the chart</span>
+        </div>
+        <div class="chart" id="numberOneChart"></div>
+        <p class="insight" id="numberOneInsight"></p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>YouTube views by rank band</h3>
+          <span class="hint">Median weekly views reported at each position</span>
+        </div>
+        <div class="chart" id="viewsBandChart"></div>
+        <p class="insight" id="viewsBandInsight"></p>
+      </div>
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Cross-platform overlap</h3>
+          <span class="hint">Exact normalised title + artist match, a conservative lower bound</span>
+        </div>
+        <div class="overlap" id="overlapBlock"></div>
+        <div class="table-wrap" id="overlapTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-velocity">
+    <header class="panel-head">
+      <span class="qnum">06</span>
+      <div>
+        <h2>Release velocity</h2>
+        <p class="question">How long after release does a song actually reach a chart?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Days from release to first chart appearance</h3>
+          <span class="hint">One observation per item</span>
+        </div>
+        <div class="chart" id="lagChart"></div>
+        <p class="insight" id="lagInsight"></p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Median entry delay by year</h3>
+          <span class="hint">Days, for items first charting that year</span>
+        </div>
+        <div class="chart" id="lagYearChart"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-creators">
+    <header class="panel-head">
+      <span class="qnum">07</span>
+      <div>
+        <h2>Who makes the hits</h2>
+        <p class="question">Which writers and producers sit behind the most charting songs?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Songwriters</h3>
+          <span class="hint">Distinct charting songs credited</span>
+        </div>
+        <div class="chart" id="writersChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Producers</h3>
+          <span class="hint">Distinct charting songs credited</span>
+        </div>
+        <div class="chart" id="producersChart"></div>
+      </div>
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Most-viewed videos while charting</h3>
+          <span class="hint">Sum of weekly reported views across every chart observation</span>
+        </div>
+        <div class="table-wrap" id="videosTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-intake">
+    <header class="panel-head">
+      <span class="qnum">08</span>
+      <div>
+        <h2>New-music intake</h2>
+        <p class="question">How much of the Spotify chart is genuinely fresh each week?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Spotify entry status by year</h3>
+          <span class="hint">New entries vs re-entries vs movement within the chart</span>
+        </div>
+        <div class="chart" id="entriesChart"></div>
+        <p class="insight" id="entriesInsight"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="s-quality">
+    <header class="panel-head">
+      <span class="qnum">09</span>
+      <div>
+        <h2>Data quality &amp; method</h2>
+        <p class="question">What should a reader discount before acting on these numbers?</p>
+      </div>
+    </header>
+    <div class="grid-2">
+      <div class="card card-wide">
+        <div class="card-head">
+          <h3>Quality ledger</h3>
+          <span class="hint">Counts across the full unified view, including excluded rows</span>
+        </div>
+        <div class="table-wrap" id="qualityTable"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Reading the data</h3>
+        </div>
+        <ul class="notes" id="methodNotes"></ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="foot-inner">
+    <div>
+      <strong>Global Music Intelligence</strong>
+      <p>
+        Source: National Music Charts (Güncel Gürsel Artıktay), Zenodo
+        record 23645386, CC BY 4.0. Prepared with Python, PostgreSQL and SQL.
+      </p>
+    </div>
+    <div class="foot-meta" id="footMeta"></div>
+  </div>
+</footer>
+
+<div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+<script src="assets/dashboard.js"></script>
+</body>
+</html>

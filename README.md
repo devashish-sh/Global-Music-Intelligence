@@ -45,13 +45,14 @@ These are preparation-stage counts, not final analytical findings. Results shoul
 
 ```
 .
-├── analysis/             # Business analysis SQL
+├── analysis/             # Business analysis SQL (02 = final query set)
+├── dashboard/            # Analytical dashboard (HTML/CSS/JS + exported data)
 ├── database/             # PostgreSQL schema, audit and transformation SQL
-├── python/               # Data loading, audit and cleaning scripts
+├── python/               # Data loading, audit, cleaning and export scripts
 ├── documentation/        # Methodology and data-quality documentation
 ├── data/                 # Local data folders (raw files excluded from Git)
 ├── tableau/              # Tableau workbook exports and dashboard assets
-├── .env.example          # Local database configuration template
+├── .env.example         # Local database configuration template
 └── .gitignore
 ```
 
@@ -70,6 +71,49 @@ These are preparation-stage counts, not final analytical findings. Results shoul
 
 Use the SQL files and script comments as the source of truth for the current implementation. The local raw data and database are not included in this repository.
 
+## Analytical dashboard
+
+The final dashboard answers 26 business questions, each backed by a tagged query in
+`analysis/02_business_queries.sql`:
+
+1. Export the query results to JSON: `python python/export_dashboard_data.py`
+2. Serve the folder: `cd dashboard && python3 -m http.server 8787`
+3. Open `http://localhost:8787`
+
+The page must be served over HTTP (not opened from the file system) because it fetches
+`dashboard/data/dashboard.json`. It has no build step and no external dependencies.
+
+Dashboard sections: chart activity and seasonality, song longevity and concentration,
+artist reach, market coverage and market leaders, platform comparison (#1 positions,
+views by rank band, cross-platform overlap), release velocity, songwriter and producer
+credits, new-music intake, and the data-quality ledger.
+
+Notes on the numbers shown:
+
+- Every chart in the source is full (200 Spotify / 100 YouTube rows per market-week), so
+average chart rank is a constant and is not reported as a finding.
+- Spotify country charts sample roughly 13 weeks per year; only the Global and Türkiye
+charts are weekly. YouTube is weekly in all 44 markets. Market panels therefore compare
+the number of weeks actually observed.
+
+### Tableau version
+
+A complete, step-by-step build guide for the Tableau workbook — three dashboards plus a
+method sheet, with calculated fields, layout sizes, a validation table and the publishing
+and portfolio plan — is in
+[documentation/tableau_build_guide.md](documentation/tableau_build_guide.md).
+
+Generate its data sources first:
+
+```bash
+python python/export_tableau_data.py
+```
+
+This writes ten dashboard-sized CSVs to `tableau/data/` (largest: 184,616 rows, 27 MB),
+well inside Tableau Public's 15M-row, 1 GB-per-file limits. Tableau Public cannot connect
+to the local PostgreSQL database, so the analysis layer is materialised for it. The CSVs
+are generated files and are not committed.
+
 ## Methodological notes and limitations
 
 - Spotify streams and YouTube views are different measures and must be analyzed separately.
@@ -86,7 +130,7 @@ Use the SQL files and script comments as the source of truth for the current imp
 
 - Reproducible PostgreSQL cleaning and analysis workflow
 - Data-quality and methodology documentation
-- Tableau dashboards for executive overview, song/artist intelligence, market trends and platform comparison
+- Analytical dashboard (delivered as `dashboard/`, covering executive overview, song/artist intelligence, market trends and platform comparison)
 - Portfolio summary with evidence-based findings
 
 ## Author
